@@ -1,132 +1,288 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# PasarTani API (AgriDirect Backend)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+> **PasarTani API** adalah layanan *backend* RESTful untuk platform *agritech* **PasarTani** yang memotong rantai distribusi pertanian dengan menghubungkan petani secara langsung ke konsumen (*Direct-to-Consumer*). Dibangun menggunakan **NestJS**, **TypeORM**, dan **PostgreSQL (Supabase)**, API ini mengelola autentikasi JWT, sistem multi-peran (*Multi-Role*), sinkronisasi harga pangan real-time dari Bank Indonesia (PIHPS), manajemen lahan pertanian, kalkulator *Smart Crop Planner*, serta katalog hasil panen.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Lencana (Badges)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL_Supabase-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![TypeORM](https://img.shields.io/badge/TypeORM-FE0803?style=for-the-badge&logo=typeorm&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT_Auth-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
+![Swagger](https://img.shields.io/badge/Swagger_OpenAPI-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
 
-## Project setup
+---
 
-```bash
-$ npm install
+## Daftar Isi (Table of Contents)
+
+* [Deskripsi Proyek](#deskripsi-proyek)
+* [Tech Stack & Arsitektur](#tech-stack--arsitektur)
+* [Fitur & Penjelasan Modul Kode](#fitur--penjelasan-modul-kode)
+* [Alur Kerja Sistem (System Flowchart)](#alur-kerja-sistem-system-flowchart)
+* [Skema Relasi Database (ERD)](#skema-relasi-database-erd)
+* [Struktur Direktori Proyek](#struktur-direktori-proyek)
+* [Prasyarat / Kebutuhan Sistem (Requirements)](#prasyarat--kebutuhan-sistem-requirements)
+* [Cara Instalasi & Menjalankan Server (Installation)](#cara-instalasi--menjalankan-server-installation)
+* [Dokumentasi & Daftar Endpoint API](#dokumentasi--daftar-endpoint-api)
+* [Panduan Pengujian di Swagger UI](#panduan-pengujian-di-swagger-ui)
+* [Kontribusi (Contributing)](#kontribusi-contributing)
+
+---
+
+## Deskripsi Proyek
+
+**PasarTani API** berfungsi sebagai mesin pemrosesan data (*core backend*) di balik ekosistem web **PasarTani**. Layanan ini dirancang untuk menyelesaikan permasalahan utama distribusi pangan di Indonesia:
+
+1. **Direct-to-Consumer Backend Engine**: Menyediakan API terstruktur agar petani dapat memublikasikan stok hasil panen beserta harga dan kontak WhatsApp secara mandiri, sehingga konsumen dapat bertransaksi langsung tanpa perantara berlapis.
+2. **Real-Time Commodity Price Aggregator (PIHPS BI)**: Mengintegrasikan data harga komoditas pangan harian langsung dari **PIHPS Bank Indonesia** (berdasarkan wilayah provinsi dan kategori pasar seperti *Pasar Tradisional*, *Pasar Modern*, *Pedagang Besar*, dan *Produsen*) untuk menghapus asimetri informasi harga di tingkat petani.
+3. **Smart Crop Planner & Profit Simulator**: Menyediakan *engine* kalkulasi otomatis yang memproyeksikan estimasi tanggal panen, volume hasil panen, total modal tanam, dan potensi keuntungan bersih berdasarkan luas lahan serta referensi harga pasar terkini.
+4. **Keamanan & Otorisasi Multi-Peran**: Menerapkan proteksi endpoint menggunakan *JSON Web Token (JWT)*, validasi payload otomatis (`ValidationPipe`), serta sistem *Switch Role* (`PETANI` / `KONSUMEN`) secara dinamis.
+
+---
+
+## Tech Stack & Arsitektur
+
+* **Runtime & Language**: Node.js & TypeScript
+* **Backend Framework**: NestJS v11 (Modular Architecture)
+* **Database & ORM**: PostgreSQL (Supabase) & TypeORM
+* **Autentikasi & Enkripsi**: `@nestjs/jwt`, `passport-jwt`, `bcrypt`
+* **Validasi Data**: `class-validator` & `class-transformer`
+* **Integrasi HTTP & Penjadwalan**: `@nestjs/axios` & `@nestjs/schedule` (sinkronisasi harga PIHPS Bank Indonesia)
+* **Manajemen Upload File**: `multer` (penyimpanan foto komoditas hasil panen)
+* **Dokumentasi Interaktif**: `@nestjs/swagger` (OpenAPI 3.0)
+
+---
+
+## Fitur & Penjelasan Modul Kode
+
+Setiap folder di dalam `src/` dipisahkan berdasarkan domain bisnis agar mudah dipelihara (*maintainable*) dan diskalakan:
+
+* **1. Auth Module (`src/auth`)**
+  * Menangani registrasi pengguna baru (`POST /api/auth/register`) dengan *hashing* password menggunakan `bcrypt`, serta proses autentikasi login (`POST /api/auth/login`) yang menghasilkan `access_token` JWT.
+  * Berisi `JwtStrategy` dan `JwtAuthGuard` untuk memvalidasi token pada setiap permintaan terproteksi.
+* **2. Users Module (`src/users`)**
+  * Mengelola entitas `User` beserta peran pengguna (`UserRole.PETANI` dan `UserRole.KONSUMEN`).
+  * Menyediakan endpoint profil pengguna aktif (`GET /api/users/me`) dan fitur pergantian peran (`PATCH /api/users/role`).
+* **3. Market Prices Module (`src/market-prices`)**
+  * Mengelola entitas `MarketPrice` dengan enum `MarketType` (`Pasar Tradisional`, `Pasar Modern`, `Pedagang Besar`, `Produsen`).
+  * Memiliki mekanisme sinkronisasi data harga pangan real-time dari **PIHPS Bank Indonesia** (`POST /api/market-prices/sync`) dan pencarian harga berdasarkan komoditas maupun provinsi.
+* **4. Lands Module (`src/lands`)**
+  * Mengelola entitas `Land` yang terhubung ke akun petani (nama lahan, lokasi/dusun, luas lahan dalam $m^2$, jenis tanah, dan status lahan).
+* **5. Crop Planner Module (`src/crop-planner`)**
+  * Mengelola entitas `CropPlan` yang menghubungkan data `Land` dengan referensi `MarketPrice` untuk menghitung simulasi hasil panen, modal tanam, dan estimasi profit.
+* **6. Harvests Module (`src/harvests`)**
+  * Mengelola entitas `Harvest` untuk publikasi katalog hasil panen petani lengkap dengan dukungan unggah foto (`multipart/form-data`), pembaruan stok/harga, dan filter lokasi daerah untuk konsumen.
+* **7. Common & Database Module (`src/common` & `src/database`)**
+  * `src/common`: Berisi *custom decorators* (`@CurrentUser()`, `@Roles()`), `RolesGuard` untuk pembatasan akses berbasis peran, dan `HttpExceptionFilter` untuk menyeragamkan format respons error JSON.
+  * `src/database`: Mengatur konfigurasi koneksi TypeORM ke PostgreSQL Supabase serta skrip `seed.ts` untuk pengisian data awal.
+
+---
+
+## Alur Kerja Sistem (System Flowchart)
+
+```mermaid
+flowchart TD
+    Client[Frontend Web / Swagger UI] -->|HTTP Request + Bearer JWT| Filter[Global Exception Filter]
+    Filter --> Guard[JwtAuthGuard & RolesGuard]
+    Guard --> Pipe[Global ValidationPipe]
+
+    Pipe --> AuthMod[Auth & Users Module]
+    Pipe --> MarketMod[Market Prices Module]
+    Pipe --> FarmerMod[Modul Petani: Lands, Crop Planner, Harvests]
+    Pipe --> PublicMod[Katalog Publik: GET Harvests & Prices]
+
+    MarketMod <-->|HTTP Sync / Cron Job| BI[(PIHPS Bank Indonesia API)]
+    AuthMod <--> DB[(PostgreSQL Supabase)]
+    MarketMod <--> DB
+    FarmerMod <--> DB
+    PublicMod <--> DB
+    FarmerMod -->|Multer Upload| Storage[/uploads Directory/]
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+## Skema Relasi Database (ERD)
 
-# watch mode
-$ npm run start:dev
+```mermaid
+erDiagram
+    USERS ||--o{ LANDS : "memiliki"
+    USERS ||--o{ CROP_PLANS : "merencanakan"
+    USERS ||--o{ HARVESTS : "mempublikasikan"
+    LANDS ||--o{ CROP_PLANS : "digunakan_pada"
+    MARKET_PRICES ||--o{ CROP_PLANS : "referensi_harga"
 
-# production mode
-$ npm run start:prod
+    USERS {
+        int id PK
+        string name
+        string email
+        string password
+        enum role "PETANI | KONSUMEN"
+        string phone
+    }
+    LANDS {
+        int id PK
+        string name
+        string location
+        float areaSize
+        string soilType
+        int userId FK
+    }
+    MARKET_PRICES {
+        int id PK
+        string commodityName
+        enum marketType
+        string province
+        int pricePerUnit
+        string unit
+        float changePercent
+        date recordedDate
+    }
+    CROP_PLANS {
+        int id PK
+        string commodityName
+        float estimatedYield
+        int estimatedCost
+        int estimatedProfit
+        date plantingDate
+        date harvestDate
+        int landId FK
+        int marketPriceId FK
+        int userId FK
+    }
+    HARVESTS {
+        int id PK
+        string productName
+        string location
+        int pricePerUnit
+        int stock
+        string unit
+        string imageUrl
+        string whatsappNumber
+        int userId FK
+    }
 ```
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ npm run test
+## Struktur Direktori Proyek
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```text
+agridirect-api/
+├── src/
+│   ├── auth/                  # Modul registrasi, login, JwtStrategy & JwtAuthGuard
+│   ├── common/                # Decorators (@CurrentUser, @Roles), RolesGuard & Exception Filter
+│   ├── crop-planner/          # Modul kalkulasi simulasi tanam & estimasi profit
+│   ├── database/              # Konfigurasi koneksi TypeORM & seed.ts
+│   ├── harvests/              # Modul manajemen katalog panen & upload foto (Multer)
+│   ├── lands/                 # Modul CRUD data lahan pertanian petani
+│   ├── market-prices/         # Modul harga komoditas pangan & integrasi PIHPS BI
+│   ├── users/                 # Modul profil pengguna & switch role (PETANI / KONSUMEN)
+│   ├── app.module.ts          # Root module & registrasi seluruh modul aplikasi
+│   └── main.ts                # Entry point server, global prefix (/api), CORS & Swagger
+├── uploads/                   # Direktori penyimpanan lokal foto hasil panen
+├── .env                       # Konfigurasi environment variables (tidak di-push ke Git)
+├── .gitignore                 # Daftar file/folder yang diabaikan Git
+├── package.json               # Daftar dependensi dan skrip NPM
+└── tsconfig.json              # Konfigurasi compiler TypeScript
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Prasyarat / Kebutuhan Sistem (Requirements)
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Sebelum menjalankan backend secara lokal, pastikan lingkungan pengembangan Anda memenuhi spesifikasi berikut:
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+* **Node.js**: Versi `18.x` atau `20.x+`
+* **Package Manager**: `npm` (v9.x+)
+* **Database**: Instance PostgreSQL aktif (direkomendasikan menggunakan **Supabase** dengan *Connection Pooler URL*)
+* **Akses Internet**: Diperlukan untuk koneksi ke database Supabase dan penarikan data harga dari API PIHPS Bank Indonesia
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Observability
+## Cara Instalasi & Menjalankan Server (Installation)
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+1. **Clone Repositori**
+   ```bash
+   git clone [https://github.com/username-kamu/agridirect-api.git](https://github.com/username-kamu/agridirect-api.git)
+   cd agridirect-api
+   ```
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+2. **Install Dependensi**
+   ```bash
+   npm install
+   ```
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+3. **Konfigurasi Environment Variables**
+   Buat berkas `.env` pada direktori root proyek dan sesuaikan dengan kredensial database Supabase serta secret JWT Anda:
+   ```env
+   PORT=3000
+   DATABASE_URL=postgresql://postgres.[PROJECT-REF]:[PASSWORD]@[aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres](https://aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres)
+   JWT_SECRET=rahasia_jwt_pasartani_2026
+   JWT_EXPIRES_IN=7d
+   ```
 
-To add it to this project, run this and approve the code it prints at [observe.nestjs.com/link](https://observe.nestjs.com/link) - signing up for free if you have no account:
+4. **Jalankan Server**
+   ```bash
+   # Mode development (dengan auto-reload saat kode diubah)
+   npm run start:dev
 
-```bash
-$ npx @nestjs/observe link
-```
+   # Build & jalankan mode produksi
+   npm run build
+   npm run start:prod
+   ```
 
-It installs `@nestjs/observe`, wires it into `AppModule` and `main.ts`, and writes the app key and secret into `.env`, which every `nest start` script (`start`, `start:dev`, `start:debug`) then loads. In production, set `OBSERVE_APP_KEY` and `OBSERVE_APP_SECRET` in the environment instead.
+5. **Verifikasi Server Berjalan**
+   Setelah server menyala tanpa error, akses dokumentasi interaktif Swagger di browser:
+   ```text
+   http://localhost:3000/api/docs
+   ```
 
-Or do it by hand:
+---
 
-```bash
-$ npm install @nestjs/observe
-```
+## Dokumentasi & Daftar Endpoint API
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/sdk) - it takes a single import and an app key.
+Semua endpoint menggunakan prefix global `/api`. Endpoint bertanda 🔒 membutuhkan header `Authorization: Bearer <access_token>`.
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+| Modul | Method | Endpoint | Akses | Deskripsi |
+| :--- | :--- | :--- | :--- | :--- |
+| **Auth** | `POST` | `/api/auth/register` | Publik | Mendaftarkan akun pengguna baru |
+| **Auth** | `POST` | `/api/auth/login` | Publik | Login dan mendapatkan `access_token` JWT |
+| **Users** | `GET` | `/api/users/me` | 🔒 Login | Mengambil detail profil pengguna yang sedang login |
+| **Users** | `PATCH` | `/api/users/role` | 🔒 Login | Memilih atau mengganti peran (`PETANI` / `KONSUMEN`) |
+| **Market Prices** | `GET` | `/api/market-prices` | Publik | Menampilkan daftar harga komoditas pangan terkini |
+| **Market Prices** | `POST` | `/api/market-prices/sync` | 🔒 Login | Sinkronisasi data harga pangan terbaru dari PIHPS BI |
+| **Lands** | `GET` | `/api/lands` | 🔒 Petani | Menampilkan semua lahan milik petani yang login |
+| **Lands** | `POST` | `/api/lands` | 🔒 Petani | Menambahkan data lahan pertanian baru |
+| **Crop Planner** | `GET` | `/api/crop-planner` | 🔒 Petani | Melihat daftar rencana tanam & simulasi petani |
+| **Crop Planner** | `POST` | `/api/crop-planner` | 🔒 Petani | Membuat simulasi & menyimpan rencana tanam baru |
+| **Harvests** | `GET` | `/api/harvests` | Publik | Menampilkan katalog hasil panen yang tersedia |
+| **Harvests** | `POST` | `/api/harvests` | 🔒 Petani | Memposting komoditas hasil panen baru (dengan foto) |
 
-## Resources
+---
 
-Check out a few resources that may come in handy when working with NestJS:
+## Panduan Pengujian di Swagger UI
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+1. Buka `http://localhost:3000/api/docs` setelah server berjalan.
+2. Jalankan **`POST /api/auth/register`** atau **`POST /api/auth/login`**, lalu salin string `access_token` dari respons JSON.
+3. Klik tombol **Authorize** (ikon gembok hijau di kanan atas Swagger), tempel `access_token` ke kolom **Value**, lalu klik **Authorize**.
+4. Jalankan **`PATCH /api/users/role`** dengan body `{"role": "PETANI"}` untuk mengaktifkan akses fitur petani.
+5. Jalankan **`POST /api/market-prices/sync`** untuk mengisi data harga komoditas dari PIHPS Bank Indonesia.
+6. Uji fitur utama secara berurutan: **`POST /api/lands`** -> **`POST /api/crop-planner`** -> **`POST /api/harvests`**.
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Kontribusi (Contributing)
 
-## Stay in touch
+Kontribusi untuk pengembangan **PasarTani API** sangat terbuka:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+1. **Fork** repositori ini.
+2. Buat *feature branch* baru (`git checkout -b feature/NamaFitur`).
+3. Simpan perubahan Anda (`git commit -m "Menambahkan fitur baru"`).
+4. Push ke branch tersebut (`git push origin feature/NamaFitur`).
+5. Buat **Pull Request** baru menuju branch `main`.
 
-## License
+---
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+*Dikembangkan sebagai Backend Service untuk Ketahanan Pangan & Agritech Indonesia 🇮🇩*
